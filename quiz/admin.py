@@ -6,5 +6,6 @@ from .models import Quiz, Question, Answer
 class QuizAdmin(admin.ModelAdmin):
     list_display = ("id", "name", "numOfQuestions", "binary")
 
+
 admin.site.register(Question)
 admin.site.register(Answer)

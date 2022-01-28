@@ -1,5 +1,6 @@
 from django.db import models
 
+
 class Quiz(models.Model):
     name = models.CharField(max_length=255)
     numOfQuestions = models.IntegerField(default=10)

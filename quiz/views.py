@@ -1,12 +1,15 @@
 from rest_framework import viewsets
 from rest_framework.response import Response
-
-from quiz.serializers import QuizSerializer
 from rest_framework import status
+from rest_framework import mixins
+from .serializers import QuizSerializer
 from .models import Quiz
+# from rest_framework.permissions import IsAdminUser
+# from rest_framework.decorators import permission_classes
+
 
 class QuizViewSet(viewsets.ReadOnlyModelViewSet):
-    """Quiz view for creating and retrieving"""
+    """Quiz view for retrieving"""
 
     def list(self, request):
         params = request.query_params.get('type') or True
@@ -18,3 +21,9 @@ class QuizViewSet(viewsets.ReadOnlyModelViewSet):
         quiz = Quiz.objects.get(pk=pk)
         serializer = QuizSerializer(quiz, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+# @permission_classes([IsAuthenticated])
+class CreateQuizView(viewsets.GenericViewSet, mixins.CreateModelMixin):
+    """Quiz view for creating"""
+    serializer_class = QuizSerializer
