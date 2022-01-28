@@ -18,4 +18,3 @@ class QuizViewSet(viewsets.ReadOnlyModelViewSet):
         quiz = Quiz.objects.get(pk=pk)
         serializer = QuizSerializer(quiz, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
