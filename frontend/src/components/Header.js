@@ -5,16 +5,25 @@ import {
   Navbar,
   DropdownButton,
   Dropdown,
+  NavDropdown,
 } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { useContext } from "react";
+import { AuthTokenContext } from "../store";
 
 function Header({ setMode }) {
   const navigate = useNavigate();
+  const [authToken, setAuthToken] = useContext(AuthTokenContext);
 
   const changeMode = (quizMode) => {
     setMode(quizMode);
     navigate("/");
+  };
+
+  const logoutHandler = () => {
+    setAuthToken();
+    localStorage.removeItem("token");
   };
 
   return (
@@ -33,9 +42,25 @@ function Header({ setMode }) {
               style={{ maxHeight: "100px" }}
               navbarScroll
             >
-              <LinkContainer to="/admin">
-                <Nav.Link>Admin</Nav.Link>
+              {authToken ? (
+                <NavDropdown title={"Admin"} id="admin">
+                  <LinkContainer to="admin/quiz/">
+                    <NavDropdown.Item>New Quiz</NavDropdown.Item>
+                  </LinkContainer>
+                  <LinkContainer to="admin/responses/">
+                    <NavDropdown.Item>Responses</NavDropdown.Item>
+                  </LinkContainer>
+                  <NavDropdown.Item onClick={logoutHandler}>
+                    Logout
+                  </NavDropdown.Item>
+                </NavDropdown>
+              ) : (
+                <LinkContainer to="/admin/login">
+                <Nav.Link>
+                  Login
+                </Nav.Link>
               </LinkContainer>
+              )}
             </Nav>
           </Navbar.Collapse>
           <DropdownButton id="mode-selector" title="Select Mode">

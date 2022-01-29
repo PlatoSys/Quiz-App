@@ -37,15 +37,13 @@ function QuestionsScreen() {
         config
       )
       .then((response) => setResults(response.data))
-      .catch((error) => console.log(error.response));
   };
 
   useEffect(() => {
     axios
       .get(`/api/quizs/${quizId}`)
       .then((response) => setQuestions(response.data.questions))
-      .catch((error) => console.log(error.data));
-  }, []);
+  }, [quizId]);
 
   return results ? (
     <div>

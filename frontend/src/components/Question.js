@@ -1,12 +1,11 @@
 import React from "react";
-import { Card, Button, Col, Form } from "react-bootstrap";
-import { Link } from "react-router-dom";
+import { Card, Col, Form } from "react-bootstrap";
 import Message from "./Message";
 
 function Question({ question, updateAnswer, correctAnswer }) {
 
   const getAnswerById = (answerId) => {
-    const correct = question.answers.filter((answer) => answer.id == answerId);
+    const correct = question.answers.filter((answer) => answer.id === answerId);
     return correct[0].text;
   };
 

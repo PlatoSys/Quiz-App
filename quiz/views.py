@@ -6,7 +6,7 @@ from .serializers import (AnswerSerializer, QuizSerializer,
                           GuestResponseSerializer)
 from .models import Answer, Quiz, GuestResponse
 from rest_framework.permissions import IsAdminUser
-from rest_framework.decorators import permission_classes, api_view
+from rest_framework.decorators import permission_classes
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
 
@@ -24,12 +24,6 @@ class QuizViewSet(viewsets.ReadOnlyModelViewSet):
         quiz = Quiz.objects.get(pk=pk)
         serializer = QuizSerializer(quiz, many=False)
         return Response(serializer.data, status=status.HTTP_200_OK)
-
-
-@permission_classes([IsAdminUser])
-class CreateQuizView(viewsets.GenericViewSet, mixins.CreateModelMixin):
-    """Quiz view for creating"""
-    serializer_class = QuizSerializer
 
 
 class GuestResponseView(viewsets.GenericViewSet, mixins.CreateModelMixin):
@@ -66,31 +60,14 @@ class GuestResponseView(viewsets.GenericViewSet, mixins.CreateModelMixin):
                         status=status.HTTP_200_OK)
 
 
-@api_view(['POST', 'GET'])
-def GuestResponseCheck(request):
-    return Response("TEST")
-    # answers = request.data['answers']
-    # result = {}
-    # totalScore = 0
-    # quiz = Quiz.objects.get(pk=request.data['quizId'])
-    # for each in answers:
-    #     correctAnswer = (Answer.objects
-    #                      .filter(question__pk=each['questionId'])
-    #                      .filter(correct=True).get())
-    #     serializer = AnswerSerializer(correctAnswer, many=False)
-    #     correctAnswerId = serializer.data['id']
-    #     isRight = correctAnswerId == each['answerId']
-    #     totalScore = totalScore + 1 if isRight else totalScore
-    #     result[each['questionId']] = {"result": isRight,
-    #                                   "correct": correctAnswerId}
+@permission_classes([IsAdminUser])
+class CreateQuizView(viewsets.GenericViewSet, mixins.CreateModelMixin):
+    """Quiz view for creating"""
+    serializer_class = QuizSerializer
 
-    # response = GuestResponse.objects.create(
-    #     firstname=request.data['firstname'],
-    #     lastname=request.data['lastname'],
-    #     email=request.data['email'],
-    #     totalScore=totalScore,
-    #     quiz=quiz
-    # )
-    # serializer = GuestResponseSerializer(response)
-    # return Response({'answers': result, 'result': serializer.data},
-    #                 status=status.HTTP_200_OK)
+
+# @permission_classes([IsAdminUser])
+class AdminResponsesView(viewsets.ReadOnlyModelViewSet):
+    """Admin View For Responses"""
+    serializer_class = GuestResponseSerializer
+    queryset = GuestResponse.objects.all()

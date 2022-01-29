@@ -37,6 +37,15 @@ class QuizSerializer(serializers.ModelSerializer):
 
 
 class GuestResponseSerializer(serializers.ModelSerializer):
+    quiz_name = serializers.SerializerMethodField(read_only=True)
+    total_qty = serializers.SerializerMethodField(read_only=True)
+
     class Meta:
         model = GuestResponse
         fields = '__all__'
+
+    def get_quiz_name(self, obj):
+        return obj.quiz.name
+
+    def get_total_qty(self, obj):
+        return obj.quiz.numOfQuestions

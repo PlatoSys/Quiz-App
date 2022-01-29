@@ -12,7 +12,6 @@ function HomeScreen({mode}) {
 
     axios.get(`/api/quizs/`, { params})
     .then(response => setQuizes(response.data))
-    .catch(error => console.log(error.data));
 
   }, [mode]);
 
