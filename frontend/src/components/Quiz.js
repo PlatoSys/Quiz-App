@@ -14,7 +14,7 @@ function Quiz({quiz}) {
         </Card.Text>
         <Link to={`/quiz/${quiz.id}`}>
             <Button as="div">
-              {quiz.name}
+              Checkout Quiz
             </Button>
           </Link>
       </Card.Body>

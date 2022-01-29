@@ -35,7 +35,7 @@ function Question({ question, updateAnswer, correctAnswer }) {
               <Message variant={"primary"}>Correct</Message>
             ) : (
               <Message variant={"danger"}>
-                Sorry, you are wrong! Your answer was <b>{getAnswerById(correctAnswer.userAnswer)}</b>.
+                Sorry, you are wrong! 
                 The right answer is <b>{getAnswerById(correctAnswer.correctAnswer)}</b>
               </Message>
             ))}

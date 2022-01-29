@@ -43,7 +43,6 @@ class GuestResponseView(viewsets.GenericViewSet, mixins.CreateModelMixin):
         totalScore = 0
         quiz = Quiz.objects.get(pk=request.data['quizId'])
         for each in answers:
-            print(each)
             correctAnswer = (Answer.objects
                              .filter(question__pk=each['questionId'])
                              .filter(correct=True).get())

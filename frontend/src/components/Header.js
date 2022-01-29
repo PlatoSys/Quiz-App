@@ -1,8 +1,21 @@
 import React from "react";
-import { Container, Nav, Navbar, DropdownButton, Dropdown } from "react-bootstrap";
+import {
+  Container,
+  Nav,
+  Navbar,
+  DropdownButton,
+  Dropdown,
+} from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
+import { useNavigate } from "react-router-dom";
 
-function Header({setMode}) {
+function Header({ setMode }) {
+  const navigate = useNavigate();
+
+  const changeMode = (quizMode) => {
+    setMode(quizMode);
+    navigate("/");
+  };
 
   return (
     <header>
@@ -21,15 +34,17 @@ function Header({setMode}) {
               navbarScroll
             >
               <LinkContainer to="/admin">
-                <Nav.Link>
-                  Admin
-                </Nav.Link>
+                <Nav.Link>Admin</Nav.Link>
               </LinkContainer>
             </Nav>
           </Navbar.Collapse>
           <DropdownButton id="mode-selector" title="Select Mode">
-            <Dropdown.Item id="binary" onClick={(e) => setMode("True")}>Binary</Dropdown.Item>
-            <Dropdown.Item id="non-binary" onClick={(e) => setMode("False")}>Multi Choice</Dropdown.Item>
+            <Dropdown.Item id="binary" onClick={(e) => changeMode("True")}>
+              Binary
+            </Dropdown.Item>
+            <Dropdown.Item id="non-binary" onClick={(e) => changeMode("False")}>
+              Multi Choice
+            </Dropdown.Item>
           </DropdownButton>
         </Container>
       </Navbar>
