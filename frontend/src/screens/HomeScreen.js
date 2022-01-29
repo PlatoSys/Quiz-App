@@ -10,7 +10,7 @@ function HomeScreen({mode}) {
   useEffect(() => {
     const params = new URLSearchParams([['type', mode]]);
 
-    axios.get(`http://127.0.0.1:8000/api/quizs/`, { params})
+    axios.get(`/api/quizs/`, { params})
     .then(response => setQuizes(response.data))
     .catch(error => console.log(error.data));
 

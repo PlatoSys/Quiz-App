@@ -4,7 +4,7 @@ from django.db import models
 class Quiz(models.Model):
     name = models.CharField(max_length=255)
     numOfQuestions = models.IntegerField(default=10)
-    binary = models.BooleanField(default=True)
+    binary = models.BooleanField(default=True, editable=False)
 
     def __str__(self) -> str:
         return self.name

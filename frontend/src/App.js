@@ -3,6 +3,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import { Container } from "react-bootstrap";
 import HomeScreen from './screens/HomeScreen';
+import QuestionsScreen from './screens/QuestionsScreen';
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import {useState} from 'react';
 
@@ -16,6 +17,8 @@ function App() {
           <Container>
             <Routes>
               <Route path="/" element={<HomeScreen mode={mode} />} />
+              <Route path="/quiz/:id" element={<QuestionsScreen />} />
+
             </Routes>
           </Container>
         </main>
