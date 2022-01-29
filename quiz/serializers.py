@@ -1,5 +1,6 @@
+from unittest import result
 from rest_framework import serializers
-from .models import Answer, Question, Quiz
+from .models import Answer, Question, Quiz, GuestResponse
 
 
 class AnswerSerializer(serializers.ModelSerializer):
@@ -34,3 +35,9 @@ class QuizSerializer(serializers.ModelSerializer):
         questions = obj.question_set.all()
         serializer = QuestionSerializer(questions, many=True)
         return serializer.data
+
+
+class GuestResponseSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GuestResponse
+        fields = '__all__'

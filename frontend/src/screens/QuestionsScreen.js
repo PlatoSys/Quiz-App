@@ -17,7 +17,30 @@ function QuestionsScreen() {
 
   const submitHandler = (e) => {
     e.preventDefault();
-    console.log("Submitt");
+    const config = {
+      headers: {
+        "Content-type": "application/json",
+      },
+    };
+    axios
+      .post(
+        "/api/responses/",
+        {
+          answers: [
+            { questionId: 1, answerId: 1 },
+            { questionId: 2, answerId: 3 },
+            { questionId: 3, answerId: 6 },
+          ],
+          firstname: "Test",
+          lastname: "Test",
+          email: "test@email.com",
+          quizId: 1,
+        },
+        config
+      )
+
+      .then((response) => console.log(response))
+      .catch((error) => console.log(error.response));
   };
 
   useEffect(() => {
