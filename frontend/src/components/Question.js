@@ -1,8 +1,15 @@
 import React from "react";
 import { Card, Button, Col, Form } from "react-bootstrap";
 import { Link } from "react-router-dom";
+import Message from "./Message";
 
-function Question({ question, updateAnswer}) {
+function Question({ question, updateAnswer, correctAnswer }) {
+
+  const getAnswerById = (answerId) => {
+    const correct = question.answers.filter((answer) => answer.id == answerId);
+    return correct[0].text;
+  };
+
   return (
     <Col>
       <Card style={{ width: "55rem", margin: "0.5rem" }}>
@@ -12,15 +19,26 @@ function Question({ question, updateAnswer}) {
           {question.answers.map((answer) => (
             <div key={answer.id} className="mb-3">
               <Form.Check
+                defaultChecked={correctAnswer && correctAnswer.userAnswer === answer.id}
+                disabled={correctAnswer && correctAnswer.userAnswer !== answer.id}
                 inline
                 label={answer.text}
                 onClick={() => updateAnswer(question.id, answer.id)}
                 name={`answer-${question.id}`}
-                type='radio'
+                type="radio"
                 id={`radio-${answer.id}`}
               />
             </div>
           ))}
+          {correctAnswer &&
+            (correctAnswer.result ? (
+              <Message variant={"primary"}>Correct</Message>
+            ) : (
+              <Message variant={"danger"}>
+                Sorry, you are wrong! Your answer was <b>{getAnswerById(correctAnswer.userAnswer)}</b>.
+                The right answer is <b>{getAnswerById(correctAnswer.correctAnswer)}</b>
+              </Message>
+            ))}
         </Card.Body>
       </Card>
     </Col>
