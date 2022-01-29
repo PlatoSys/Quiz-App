@@ -19,10 +19,10 @@ function ResponsesScreen() {
     axios
       .post(`/api/token/`, { username: email, password })
       .then((response) => {
-        setError()
-        setAuthToken(`Bearer ${response.data.access}`)
-        localStorage.setItem("token", `Bearer ${response.data.access}`)
-        navigate('/')
+        setError();
+        setAuthToken(`Bearer ${response.data.access}`);
+        localStorage.setItem("token", `Bearer ${response.data.access}`);
+        navigate("/");
       })
       .catch((error) => setError(error.response.data));
   };

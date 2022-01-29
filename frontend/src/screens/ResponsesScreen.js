@@ -9,7 +9,7 @@ function ResponsesScreen() {
   useEffect(() => {
     axios
       .get(`/api/admin/responses/`)
-      .then((response) => setResponses(response.data))
+      .then((response) => setResponses(response.data));
   }, []);
 
   return (
@@ -35,7 +35,9 @@ function ResponsesScreen() {
               <td>{response.email}</td>
               <td>{response.firstname}</td>
               <td>{response.lastname}</td>
-              <td>{response.totalScore}/{response.total_qty}</td>
+              <td>
+                {response.totalScore}/{response.total_qty}
+              </td>
               <td>{response.submitDate}</td>
               <td>
                 <LinkContainer to={`/quiz/${response.quiz}`}>

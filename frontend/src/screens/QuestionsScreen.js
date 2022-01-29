@@ -36,13 +36,13 @@ function QuestionsScreen() {
         },
         config
       )
-      .then((response) => setResults(response.data))
+      .then((response) => setResults(response.data));
   };
 
   useEffect(() => {
     axios
       .get(`/api/quizs/${quizId}`)
-      .then((response) => setQuestions(response.data.questions))
+      .then((response) => setQuestions(response.data.questions));
   }, [quizId]);
 
   return results ? (
@@ -65,7 +65,7 @@ function QuestionsScreen() {
         </Card>
       </Col>
       <Row>
-        {questions.map((question) => (          
+        {questions.map((question) => (
           <Question
             key={question.id}
             question={question}

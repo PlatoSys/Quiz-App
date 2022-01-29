@@ -3,7 +3,6 @@ import { Card, Col, Form } from "react-bootstrap";
 import Message from "./Message";
 
 function Question({ question, updateAnswer, correctAnswer }) {
-
   const getAnswerById = (answerId) => {
     const correct = question.answers.filter((answer) => answer.id === answerId);
     return correct[0].text;
@@ -18,8 +17,12 @@ function Question({ question, updateAnswer, correctAnswer }) {
           {question.answers.map((answer) => (
             <div key={answer.id} className="mb-3">
               <Form.Check
-                defaultChecked={correctAnswer && correctAnswer.userAnswer === answer.id}
-                disabled={correctAnswer && correctAnswer.userAnswer !== answer.id}
+                defaultChecked={
+                  correctAnswer && correctAnswer.userAnswer === answer.id
+                }
+                disabled={
+                  correctAnswer && correctAnswer.userAnswer !== answer.id
+                }
                 inline
                 label={answer.text}
                 onClick={() => updateAnswer(question.id, answer.id)}
@@ -34,8 +37,8 @@ function Question({ question, updateAnswer, correctAnswer }) {
               <Message variant={"primary"}>Correct</Message>
             ) : (
               <Message variant={"danger"}>
-                Sorry, you are wrong! 
-                The right answer is <b>{getAnswerById(correctAnswer.correctAnswer)}</b>
+                Sorry, you are wrong! The right answer is{" "}
+                <b>{getAnswerById(correctAnswer.correctAnswer)}</b>
               </Message>
             ))}
         </Card.Body>

@@ -56,10 +56,8 @@ function Header({ setMode }) {
                 </NavDropdown>
               ) : (
                 <LinkContainer to="/admin/login">
-                <Nav.Link>
-                  Login
-                </Nav.Link>
-              </LinkContainer>
+                  <Nav.Link>Login</Nav.Link>
+                </LinkContainer>
               )}
             </Nav>
           </Navbar.Collapse>
