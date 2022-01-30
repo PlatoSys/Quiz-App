@@ -5,17 +5,18 @@ import QuestionSample from "../components/QuestionSample";
 import axios from "axios";
 import { useContext } from "react";
 import { AuthTokenContext } from "../store";
+import Message from "../components/Message";
 
 function NewQuizScreen() {
   const [name, setName] = useState();
   const [binary, setBinary] = useState(true);
+  const [message, setMessage] = useState();
   const [numOfQuestions, setNumOfQuestions] = useState(0);
   const [questions, setQuestions] = useState([]);
   const [authToken] = useContext(AuthTokenContext);
 
   const submitHandler = (e) => {
     e.preventDefault();
-    console.log(questions);
     const config = {
       headers: {
         "Content-type": "application/json",
@@ -33,14 +34,27 @@ function NewQuizScreen() {
         },
         config
       )
-      .then((response) => console.log(response.data));
+      .then((response) => setMessage({
+        status: response.status,
+        detail: "Successfuly Created!"
+      }))
+      .catch((error) =>
+        setMessage({
+          status: error.response.status,
+          detail: error.response.data.detail,
+        })
+      );
   };
 
   return (
     <div>
       <FormContainer>
         <h1>Create new Quiz</h1>
-
+        {message && (
+          <Message variant={message.status !== 201 ? "danger" : "primary"}>
+            {message.detail}
+          </Message>
+        )}
         <Form type="submit" variant="primary" onSubmit={submitHandler}>
           <Form.Group controlId="name" className="my-2">
             <Form.Label>Quiz Name</Form.Label>

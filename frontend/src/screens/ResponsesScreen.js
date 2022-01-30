@@ -2,13 +2,22 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button, Table } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
+import { useContext } from "react";
+import { AuthTokenContext } from "../store";
 
 function ResponsesScreen() {
   const [responses, setResponses] = useState([]);
+  const [authToken] = useContext(AuthTokenContext);
 
+  const config = {
+    headers: {
+      "Content-type": "application/json",
+      Authorization: authToken,
+    },
+  };
   useEffect(() => {
     axios
-      .get(`/api/admin/responses/`)
+      .get(`/api/admin/responses/`, config)
       .then((response) => setResponses(response.data));
   }, []);
 
