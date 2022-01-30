@@ -33,26 +33,26 @@ class GuestResponseView(viewsets.GenericViewSet, mixins.CreateModelMixin):
 
     @method_decorator(ensure_csrf_cookie)
     def create(self, request, *args, **kwargs):
-        answers = request.data['answers']
+        data = request.data
+        answers = data['answers']
         result = {}
         totalScore = 0
-        quiz = Quiz.objects.get(pk=request.data['quizId'])
+        quiz = Quiz.objects.get(pk=data['quizId'])
         for each in answers:
             correctAnswer = (Answer.objects
                              .filter(question__pk=each['questionId'])
                              .filter(correct=True).get())
             serializer = AnswerSerializer(correctAnswer, many=False)
-            correctAnswerId = serializer.data['id']
-            isRight = correctAnswerId == each['answerId']
+            isRight = correctAnswer.id == each['answerId']
             totalScore = totalScore + 1 if isRight else totalScore
             result[each['questionId']] = {"result": isRight,
-                                          "correctAnswer": correctAnswerId,
+                                          "correctAnswer": correctAnswer.id,
                                           "userAnswer": each['answerId']}
 
         response = GuestResponse.objects.create(
-            firstname=request.data['firstname'],
-            lastname=request.data['lastname'],
-            email=request.data['email'],
+            firstname=data['firstname'],
+            lastname=data['lastname'],
+            email=data['email'],
             totalScore=totalScore,
             quiz=quiz
         )
@@ -84,4 +84,4 @@ class CreateQuizView(viewsets.GenericViewSet, mixins.CreateModelMixin):
 class AdminResponsesView(viewsets.ReadOnlyModelViewSet):
     """Admin View For Responses"""
     serializer_class = GuestResponseSerializer
-    queryset = GuestResponse.objects.all()
+    queryset = GuestResponse.objects.all().order_by("-submitDate")

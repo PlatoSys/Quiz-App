@@ -49,13 +49,6 @@ function QuestionSample({ id, binary, questions, setQuestions }) {
 
   return (
     <div>
-      <Button
-        className="my-1"
-        variant={"info"}
-        onClick={() => console.log(questions, question)}
-      >
-        Question Info
-      </Button>
       <Form.Group controlId={id} className="my-3 mx-2">
         <Form.Label>Question {id}</Form.Label>
         <Form.Control
@@ -93,7 +86,6 @@ function QuestionSample({ id, binary, questions, setQuestions }) {
             onChange={(e) => updateAnswer(e)}
           ></Form.Control>
         </Form.Group>
-        {console.log(binary)}
         {binary === false && (
           <Form.Group controlId={`answer3-${id}`} className="my-2 mx-3">
             <Form.Label>Answer 3</Form.Label>

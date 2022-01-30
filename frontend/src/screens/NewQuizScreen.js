@@ -34,16 +34,26 @@ function NewQuizScreen() {
         },
         config
       )
-      .then((response) => setMessage({
-        status: response.status,
-        detail: "Successfuly Created!"
-      }))
+      .then((response) =>
+        setMessage({
+          status: response.status,
+          detail: "Quiz has been Created!",
+        })
+      )
       .catch((error) =>
         setMessage({
           status: error.response.status,
           detail: error.response.data.detail,
         })
       );
+    window.scrollTo(0, 0);
+  };
+
+  const removeLastQuestion = () => {
+    setNumOfQuestions(numOfQuestions - 1);
+    let oldQuestions = [...questions];
+    oldQuestions.pop();
+    setQuestions(oldQuestions);
   };
 
   return (
@@ -103,7 +113,7 @@ function NewQuizScreen() {
               <Button
                 className="my-2"
                 variant={"danger"}
-                onClick={() => setNumOfQuestions(numOfQuestions - 1)}
+                onClick={() => removeLastQuestion()}
               >
                 Remove Question
               </Button>

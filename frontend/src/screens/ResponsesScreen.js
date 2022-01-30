@@ -32,7 +32,7 @@ function ResponsesScreen() {
             <th>Firstname</th>
             <th>Lastname</th>
             <th>TotalScore</th>
-            <th>Date</th>
+            <th>DateTime</th>
             <th></th>
           </tr>
         </thead>
@@ -47,7 +47,7 @@ function ResponsesScreen() {
               <td>
                 {response.totalScore}/{response.total_qty}
               </td>
-              <td>{response.submitDate}</td>
+              <td>{response.submitDate.substring(0, 19).replace("T", "-")}</td>
               <td>
                 <LinkContainer to={`/quiz/${response.quiz}`}>
                   <Button variant="primary" className="btn">
