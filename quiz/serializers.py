@@ -18,7 +18,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_answers(self, obj):
-        answers = obj.answer_set.all()
+        answers = Answer.objects.filter(question=obj.id)
         serializer = AnswerSerializer(answers, many=True)
         return serializer.data
 

@@ -4,11 +4,12 @@ from rest_framework import status
 from rest_framework import mixins
 from .serializers import (AnswerSerializer, QuizSerializer,
                           GuestResponseSerializer)
-from .models import Answer, Quiz, GuestResponse
+from .models import Answer, Quiz, GuestResponse, Question
 from rest_framework.permissions import IsAdminUser
 from rest_framework.decorators import permission_classes
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
+from copy import copy
 
 
 class QuizViewSet(viewsets.ReadOnlyModelViewSet):
@@ -65,8 +66,21 @@ class CreateQuizView(viewsets.GenericViewSet, mixins.CreateModelMixin):
     """Quiz view for creating"""
     serializer_class = QuizSerializer
 
+    def perform_create(self, serializer):
+        quiz = serializer.save()
+        for question in self.request.data['questions']:
+            answers = copy(question['answers'])
+            del question['answers']
+            del question['id']
+            question = Question(quiz=quiz, **question)
+            question.save()
+            for answer in answers:
+                del answer['id']
+                answer = Answer(question=question, **answer)
+                answer.save()
 
-# @permission_classes([IsAdminUser])
+
+@permission_classes([IsAdminUser])
 class AdminResponsesView(viewsets.ReadOnlyModelViewSet):
     """Admin View For Responses"""
     serializer_class = GuestResponseSerializer

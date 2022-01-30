@@ -28,11 +28,11 @@ function QuestionsScreen() {
       .post(
         "/api/responses/",
         {
+          quizId,
           answers,
           firstname: "Plato",
           lastname: "Plato",
           email: "plato@email",
-          quizId: 1,
         },
         config
       )

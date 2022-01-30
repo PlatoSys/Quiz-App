@@ -57,4 +57,4 @@ class Command(BaseCommand):
                                   text=f"{ans2} - {booleans[1]}")
             Answer.objects.create(question=question, correct=booleans[2],
                                   text=f"{ans3} - {booleans[2]}")
-        self.stdout.write("Number of categories: 10")
+        self.stdout.write("Generated 2 Quizes with 10 Questions")

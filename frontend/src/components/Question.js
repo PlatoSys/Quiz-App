@@ -17,6 +17,7 @@ function Question({ question, updateAnswer, correctAnswer }) {
           {question.answers.map((answer) => (
             <div key={answer.id} className="mb-3">
               <Form.Check
+                required
                 defaultChecked={
                   correctAnswer && correctAnswer.userAnswer === answer.id
                 }
