@@ -12,7 +12,7 @@ function ResponsesScreen() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState();
-  const [authToken, setAuthToken] = useContext(AuthTokenContext);
+  const [_, setAuthToken] = useContext(AuthTokenContext);
 
   const submitHandler = (e) => {
     e.preventDefault();
