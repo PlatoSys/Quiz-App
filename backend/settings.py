@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from datetime import timedelta
 import environ
+import dns
+import sys
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
@@ -114,11 +116,14 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'djongo',
+        'NAME': 'testdb2',
+        'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': 'mongodb+srv://platoniquiz:platoniquiz@cluster0.r2tna.mongodb.net/testdb2?w=majority'
+        }  
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/4.0/ref/settings/#auth-password-validators
@@ -160,3 +165,6 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+if 'test' in sys.argv: # Testing Environ
+    DATABASES['default']['ENGINE'] = 'django.db.backends.sqlite3'

@@ -9,6 +9,7 @@ from rest_framework.permissions import IsAdminUser
 from rest_framework.decorators import permission_classes
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
+import random
 
 
 class GuestResponseView(viewsets.GenericViewSet, mixins.CreateModelMixin):
@@ -24,7 +25,7 @@ class GuestResponseView(viewsets.GenericViewSet, mixins.CreateModelMixin):
         for each in answers:
             correctAnswer = (Answer.objects
                              .filter(question__pk=each['questionId'])
-                             .filter(correct=True).get())
+                             .filter(correct__in=[True]).get())
             serializer = AnswerSerializer(correctAnswer, many=False)
             isRight = correctAnswer.id == each['answerId']
             totalScore = totalScore + 1 if isRight else totalScore
@@ -52,10 +53,12 @@ class QuestionsView(viewsets.GenericViewSet, mixins.ListModelMixin):
         questionNum = request.query_params.get('numOfQuestions')
         questionNum = int(questionNum) if questionNum else 10
         binary = True if not binary else binary.lower() == "true"
-        questions = (Question.objects
-                     .filter(binary=binary).order_by('?')[:questionNum])
+        questions = Question.objects.filter(binary__in=[binary])
         serializer = QuestionSerializer(questions, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        data = serializer.data
+        random.shuffle(data)
+        data = data[:questionNum]
+        return Response(data, status=status.HTTP_200_OK)
 
 
 @permission_classes([IsAdminUser])
