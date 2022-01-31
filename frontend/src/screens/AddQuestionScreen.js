@@ -7,6 +7,7 @@ import { useContext } from "react";
 import { AuthTokenContext } from "../store";
 import Message from "../components/Message";
 import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 function AddQuestionScreen() {
   const navigate = useNavigate();
@@ -15,6 +16,7 @@ function AddQuestionScreen() {
   const [questionType, setQuestionType] = useState(true);
   const [message, setMessage] = useState();
   const [authToken] = useContext(AuthTokenContext);
+  const [loader, setLoader] = useState(false);
 
   useEffect(() => {
     if (!authToken) {
@@ -24,6 +26,8 @@ function AddQuestionScreen() {
 
   const submitHandler = (e) => {
     e.preventDefault();
+    setLoader(true);
+    setMessage();
     const config = {
       headers: {
         "Content-type": "application/json",
@@ -40,26 +44,29 @@ function AddQuestionScreen() {
         },
         config
       )
-      .then((response) =>
+      .then((response) => {
         setMessage({
           status: response.status,
           detail: "Question Has Been Added!",
-        })
-      )
-      .catch((error) =>
+        });
+        setLoader(false);
+      })
+      .catch((error) => {
         setMessage({
           status: error.response.status,
           detail: error.response.data.detail,
-        })
-      );
+        });
+        setLoader(false);
+      });
   };
 
   return (
     <div>
       <FormContainer>
         <h1>Add Question</h1>
+        {loader && <Loader />}
         {message &&
-          (message.status !== 200 ? (
+          (message.status !== 201 ? (
             <Message variant="danger">{message.detail}</Message>
           ) : (
             <Message>{message.detail}</Message>

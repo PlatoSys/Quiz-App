@@ -1,17 +1,19 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import { Button, Table } from "react-bootstrap";
-import { LinkContainer } from "react-router-bootstrap";
+import { Table } from "react-bootstrap";
 import { useContext } from "react";
 import { AuthTokenContext } from "../store";
 import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 function ResponsesScreen() {
   const navigate = useNavigate();
   const [responses, setResponses] = useState([]);
   const [authToken] = useContext(AuthTokenContext);
+  const [loader, setLoader] = useState(true);
 
   useEffect(() => {
+    setLoader(true);
     if (!authToken) {
       navigate("/");
     } else {
@@ -21,13 +23,16 @@ function ResponsesScreen() {
           Authorization: authToken,
         },
       };
-      axios
-        .get(`/api/admin/responses/`, config)
-        .then((response) => setResponses(response.data));
+      axios.get(`/api/admin/responses/`, config).then((response) => {
+        setResponses(response.data);
+        setLoader(false);
+      });
     }
   }, [authToken, navigate]);
 
-  return (
+  return loader ? (
+    <Loader />
+  ) : (
     <div>
       <Table striped bordered hover responsive className="table-sm">
         <thead>
@@ -38,7 +43,6 @@ function ResponsesScreen() {
             <th>Lastname</th>
             <th>TotalScore</th>
             <th>DateTime</th>
-            <th></th>
           </tr>
         </thead>
         <tbody>
@@ -52,13 +56,6 @@ function ResponsesScreen() {
                 {response.totalScore}/{response.totalQuestion}
               </td>
               <td>{response.submitDate.substring(0, 19).replace("T", "-")}</td>
-              <td>
-                <LinkContainer to={`/quiz/${response.quiz}`}>
-                  <Button variant="primary" className="btn">
-                    Take Quiz
-                  </Button>
-                </LinkContainer>
-              </td>
             </tr>
           ))}
         </tbody>

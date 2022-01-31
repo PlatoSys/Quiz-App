@@ -3,6 +3,7 @@ import axios from "axios";
 import Question from "../components/Question";
 import { Button, Row, Form, Col, Card } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 function QuestionsScreen({ mode, numOfQuestions, firstname, lastname, email }) {
   const navigate = useNavigate();
@@ -11,9 +12,11 @@ function QuestionsScreen({ mode, numOfQuestions, firstname, lastname, email }) {
   const [answers, setAnswers] = useState([]);
   const [results, setResults] = useState();
   const [reset, setReset] = useState(false);
+  const [loader, setLoader] = useState(true);
 
   const submitHandler = (e) => {
     e.preventDefault();
+    setLoader(true);
     axios
       .post("/api/responses/", {
         answers,
@@ -22,8 +25,11 @@ function QuestionsScreen({ mode, numOfQuestions, firstname, lastname, email }) {
         email,
         numOfQuestions,
       })
-      .then((response) => setResults(response.data));
-      window.scroll(0, 0)
+      .then((response) => {
+        setResults(response.data);
+        setLoader(false);
+      });
+    window.scroll(0, 0);
   };
 
   const resetQuiz = (e) => {
@@ -32,13 +38,15 @@ function QuestionsScreen({ mode, numOfQuestions, firstname, lastname, email }) {
   };
 
   useEffect(() => {
+    setLoader(true);
     if (!(firstname && lastname && email)) {
       navigate("/");
     } else {
       const params = new URLSearchParams({ binary: mode, numOfQuestions });
-      axios
-        .get(`/api/questions/`, { params })
-        .then((response) => setQuestions(response.data));
+      axios.get(`/api/questions/`, { params }).then((response) => {
+        setQuestions(response.data);
+        setLoader(false);
+      });
     }
   }, [reset, mode, numOfQuestions, firstname, lastname, email, navigate]);
 
@@ -52,7 +60,9 @@ function QuestionsScreen({ mode, numOfQuestions, firstname, lastname, email }) {
     setAnswers(otherAnswers);
   };
 
-  return results ? (
+  return loader ? (
+    <Loader />
+  ) : results ? (
     <div>
       {" "}
       <Col>

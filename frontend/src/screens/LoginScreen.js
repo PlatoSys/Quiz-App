@@ -5,16 +5,18 @@ import Message from "../components/Message";
 import { useContext } from "react";
 import { AuthTokenContext } from "../store";
 import { useNavigate } from "react-router-dom";
+import Loader from "../components/Loader";
 
 function ResponsesScreen() {
   const navigate = useNavigate();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState();
   const [_, setAuthToken] = useContext(AuthTokenContext);
+  const [loader, setLoader] = useState(false);
 
   const submitHandler = (e) => {
+    setLoader(true);
     e.preventDefault();
     axios
       .post(`/api/token/`, { username: email, password })
@@ -23,12 +25,17 @@ function ResponsesScreen() {
         setAuthToken(`Bearer ${response.data.access}`);
         localStorage.setItem("token", `Bearer ${response.data.access}`);
         navigate("/");
+        setLoader(false);
       })
-      .catch((error) => setError(error.response.data));
+      .catch((error) => {
+        setError(error.response.data);
+        setLoader(false);
+      });
   };
 
   return (
     <div>
+      {loader && <Loader />}
       <Form onSubmit={submitHandler}>
         {error && <Message variant={"danger"}>{error.detail}</Message>}
         <Form.Group controlId="email" className="my-2">
