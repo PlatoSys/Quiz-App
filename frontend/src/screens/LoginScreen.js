@@ -9,7 +9,7 @@ import Loader from "../components/Loader";
 
 function ResponsesScreen() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState();
   const [_, setAuthToken] = useContext(AuthTokenContext);
@@ -19,7 +19,7 @@ function ResponsesScreen() {
     setLoader(true);
     e.preventDefault();
     axios
-      .post(`/api/token/`, { username: email, password })
+      .post(`/api/token/`, { username, password })
       .then((response) => {
         setError();
         setAuthToken(`Bearer ${response.data.access}`);
@@ -38,17 +38,17 @@ function ResponsesScreen() {
       {loader && <Loader />}
       <Form onSubmit={submitHandler}>
         {error && <Message variant={"danger"}>{error.detail}</Message>}
-        <Form.Group controlId="email" className="my-2">
-          <Form.Label>Email Address</Form.Label>
+        <Form.Group controlId="username" className="my-2">
+          <Form.Label>Username</Form.Label>
           <Form.Control
             type="text"
-            placeholder="Enter Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            placeholder="Enter Username"
+            value={username}
+            onChange={(e) => setUsername(e.target.value)}
           ></Form.Control>
         </Form.Group>
         <Form.Group controlId="password" className="my-2">
-          <Form.Label>Email Address</Form.Label>
+          <Form.Label>Password</Form.Label>
           <Form.Control
             type="password"
             placeholder="Enter password"

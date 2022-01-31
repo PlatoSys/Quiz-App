@@ -1,8 +1,10 @@
 """Test Quiz API"""
+from copy import copy
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
+from ..serializers import QuestionSerializer
 from ..models import Answer, Question
 from django.contrib.auth import get_user_model
 User = get_user_model()
@@ -13,7 +15,7 @@ ADMIN_RESPONSES_URL = reverse("quiz:admin-responses-list")
 
 QUESTION_PAYLOAD = {
     "text": "Question 1",
-    "questionType": "True",
+    "binary": "True",
     "possibleAnswers": [
             {
                 "id": 1,
@@ -55,8 +57,6 @@ class TestQuizAPI(TestCase):
 
     def setUp(self):
         self.client = APIClient()
-        self.user = create_superuser()
-        self.client.force_authenticate(user=self.user)
 
     def create_question(self, text="TestQuestion"):
         """Create Default Question"""
@@ -131,6 +131,14 @@ class TestQuizAPI(TestCase):
         self.assertEqual(result['lastname'], response_dict['lastname'])
         self.assertEqual(result['email'], response_dict['email'])
 
+    def test_check_guest_permission(self):
+        """Check Guests permission"""
+        request = str(QUESTION_PAYLOAD).replace("'", "\"")
+        res = self.client.post(QUESTION_URL, request,
+                               content_type="application/json")
+
+        self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
+
 
 class TestAdminActions(TestCase):
     """Test Admin Actions"""
@@ -139,6 +147,15 @@ class TestAdminActions(TestCase):
         self.client = APIClient()
         self.user = create_superuser()
         self.client.force_authenticate(user=self.user)
+
+    def create_question(self, text="TestQuestion", binary=True):
+        """Create Default Question"""
+        return Question.objects.create(text=text, binary=binary)
+
+    def create_answer(self, question, text="TestQuestion", correct=False):
+        """Create Default Answer"""
+        return Answer.objects.create(question=question, text=text,
+                                     correct=correct)
 
     def test_create_question_request(self):
         """Create Question using request"""
@@ -185,3 +202,32 @@ class TestAdminActions(TestCase):
         self.assertEqual(first_response['email'], response_dict['email'])
         self.assertEqual(first_response['totalScore'], 1)
         self.assertEqual(first_response['totalQuestion'], 1)
+
+    def test_add_multi_choice_question(self):
+        """Add Multi Choice Test"""
+        question = self.create_question("TextQuestion1", False)
+        self.create_answer(question=question, correct=True)
+        self.create_answer(question=question, correct=False)
+        self.create_answer(question=question, correct=False)
+
+        question2 = self.create_question("TextQuestion2", False)
+        self.create_answer(question=question2, correct=True)
+        self.create_answer(question=question2, correct=False)
+        self.create_answer(question=question2, correct=False)
+
+        all_question = Question.objects.all()
+        self.assertEqual(len(all_question), 2)
+        serializer = QuestionSerializer(all_question, many=True)
+        for question in serializer.data:
+            self.assertEqual(len(question['answers']), 3)
+
+    def test_add_multi_choice_question_post(self):
+        """Check Post Multi choice question"""
+        request = copy(QUESTION_PAYLOAD)
+        request['binary'] = "False"
+        request = str(request).replace("'", "\"")
+        res = self.client.post(QUESTION_URL, request,
+                               content_type="application/json")
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        self.assertFalse(res.data['binary'])

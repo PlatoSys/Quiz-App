@@ -44,6 +44,7 @@ function QuestionsScreen({ mode, numOfQuestions, firstname, lastname, email }) {
     } else {
       const params = new URLSearchParams({ binary: mode, numOfQuestions });
       axios.get(`/api/questions/`, { params }).then((response) => {
+        setAnswers([]);
         setQuestions(response.data);
         setLoader(false);
       });

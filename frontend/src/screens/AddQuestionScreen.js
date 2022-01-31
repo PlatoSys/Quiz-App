@@ -13,7 +13,7 @@ function AddQuestionScreen() {
   const navigate = useNavigate();
   const [text, setText] = useState("");
   const [possibleAnswers, setPossibleAnswers] = useState([]);
-  const [questionType, setQuestionType] = useState(true);
+  const [binary, setBinary] = useState(true);
   const [message, setMessage] = useState();
   const [authToken] = useContext(AuthTokenContext);
   const [loader, setLoader] = useState(false);
@@ -39,7 +39,7 @@ function AddQuestionScreen() {
         "/api/admin/questions/",
         {
           text,
-          questionType,
+          binary,
           possibleAnswers,
         },
         config
@@ -76,7 +76,7 @@ function AddQuestionScreen() {
             controlId="type"
             className="my-2"
             onChange={(e) =>
-              setQuestionType(e.target.value === "false" ? false : true)
+              setBinary(e.target.value === "false" ? false : true)
             }
           >
             <Form.Label>Question Type</Form.Label>
@@ -97,7 +97,7 @@ function AddQuestionScreen() {
             ></Form.Control>
           </Form.Group>
           <QuestionSample
-            questionType={questionType}
+            binary={binary}
             setPossibleAnswers={setPossibleAnswers}
           />
           <div className="d-flex">

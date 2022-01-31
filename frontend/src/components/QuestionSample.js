@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Form } from "react-bootstrap";
 
-function QuestionSample({ questionType, setPossibleAnswers }) {
+function QuestionSample({ binary, setPossibleAnswers }) {
   const [answer1, setAnswer1] = useState();
   const [answer2, setAnswer2] = useState("");
   const [answer3, setAnswer3] = useState("");
@@ -13,7 +13,7 @@ function QuestionSample({ questionType, setPossibleAnswers }) {
       { id: "answer2", text: answer2, correct: false },
       { id: "answer3", text: answer3, correct: false },
     ];
-    if (questionType) {
+    if (binary) {
       answers = [...answers].filter((answer) => "answer3" !== answer.id);
     }
     let oldAnswers = [...answers].filter((answer) => id !== answer.id);
@@ -47,7 +47,7 @@ function QuestionSample({ questionType, setPossibleAnswers }) {
             onChange={(e) => setAnswer2(e.target.value)}
           ></Form.Control>
         </Form.Group>
-        {questionType === false && (
+        {binary === false && (
           <Form.Group controlId={`answer3`} className="my-2 mx-3">
             <Form.Label>Answer 3</Form.Label>
             <Form.Control
