@@ -11,7 +11,8 @@ environ.Env.read_env()
 
 
 
-SECRET_KEY = os.environ.get("SECRET_KEY")
+# SECRET_KEY = os.environ.get("SECRET_KEY")
+SECRET_KEY = "django-insecure-um-*&)^t6kd!y0#-z-d*!p@-k$=(fbkb!xctk7lwgx)#q52(+c"
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
