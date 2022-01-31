@@ -28,7 +28,7 @@ function Header({ setMode, mode }) {
 
   return (
     <header>
-      <Navbar bg="dark" variant="dark" expand="lg" collapseOnSelect>
+      <Navbar bg="primary" variant="dark" expand="lg" collapseOnSelect>
         <Container fluid>
           <LinkContainer to="/">
             <Navbar.Brand href="/">
@@ -64,6 +64,7 @@ function Header({ setMode, mode }) {
           <DropdownButton
             className="pr-2"
             id="mode-selector"
+            variant="light"
             title={mode ? "Binary" : "Multiple Choice"}
           >
             <Dropdown.Item id="binary" onClick={(e) => changeMode(true)}>
