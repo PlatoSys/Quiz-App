@@ -41,7 +41,7 @@ function ResponsesScreen() {
         <Form.Group controlId="email" className="my-2">
           <Form.Label>Email Address</Form.Label>
           <Form.Control
-            type="email"
+            type="text"
             placeholder="Enter Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
