@@ -1,27 +1,35 @@
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-import Quiz from "../components/Quiz";
-import { Row } from "react-bootstrap";
+import React from "react";
+import UserForm from "../components/UserForm";
+import { useNavigate } from "react-router-dom";
 
-function HomeScreen({ mode }) {
-  const [quizes, setQuizes] = useState([]);
+function HomeScreen({
+  email,
+  firstname,
+  lastname,
+  setEmail,
+  setFirstname,
+  setLastname,
+  setNumOfQuestions,
+  numOfQuestions,
+}) {
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const params = new URLSearchParams([["type", mode]]);
-
-    axios
-      .get(`/api/quizs/`, { params })
-      .then((response) => setQuizes(response.data));
-  }, [mode]);
+  const getQuestions = () => {
+    navigate("/questions");
+  };
 
   return (
-    <div>
-      <Row>
-        {quizes.map((quiz) => (
-          <Quiz key={quiz.id} quiz={quiz} />
-        ))}
-      </Row>
-    </div>
+    <UserForm
+      getQuestions={getQuestions}
+      email={email}
+      firstname={firstname}
+      lastname={lastname}
+      setEmail={setEmail}
+      setFirstname={setFirstname}
+      setLastname={setLastname}
+      setNumOfQuestions={setNumOfQuestions}
+      numOfQuestions={numOfQuestions}
+    />
   );
 }
 

@@ -2,17 +2,19 @@ import React from "react";
 import { Form, Button } from "react-bootstrap";
 
 function UserForm({
-  setProfile,
+  getQuestions,
   email,
   firstname,
   lastname,
   setFirstname,
   setLastname,
   setEmail,
+  numOfQuestions,
+  setNumOfQuestions,
 }) {
   return (
     <div>
-      <Form>
+      <Form onSubmit={getQuestions}>
         <Form.Group controlId="email" className="my-2">
           <Form.Label>Email Address</Form.Label>
           <Form.Control
@@ -20,6 +22,7 @@ function UserForm({
             type="email"
             placeholder="Enter Email"
             value={email}
+            autoComplete="off"
             onChange={(e) => setEmail(e.target.value)}
           ></Form.Control>
         </Form.Group>
@@ -27,10 +30,10 @@ function UserForm({
           <Form.Label>Firstname</Form.Label>
           <Form.Control
             required
-            type="Firstname"
+            type="name"
             placeholder="Enter Firstname"
             value={firstname}
-            autoComplete="on"
+            autoComplete="off"
             onChange={(e) => setFirstname(e.target.value)}
           ></Form.Control>
         </Form.Group>
@@ -41,11 +44,22 @@ function UserForm({
             type="Lastname"
             placeholder="Enter Lastname"
             value={lastname}
-            autoComplete="on"
+            autoComplete="off"
             onChange={(e) => setLastname(e.target.value)}
           ></Form.Control>
         </Form.Group>
-        <Button onClick={() => setProfile(true)} className="my-2">
+        <Form.Group controlId="numOfQuestions" className="my-2">
+          <Form.Label>Questions Number</Form.Label>
+          <Form.Control
+            required
+            type="Lastname"
+            placeholder="Enter Questions Number"
+            value={numOfQuestions}
+            autoComplete="off"
+            onChange={(e) => setNumOfQuestions(Number(e.target.value))}
+          ></Form.Control>
+        </Form.Group>
+        <Button type="submit" className="my-2">
           Complete User Data
         </Button>
       </Form>

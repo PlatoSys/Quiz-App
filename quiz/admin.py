@@ -1,10 +1,5 @@
 from django.contrib import admin
-from .models import Quiz, Question, Answer, GuestResponse
-
-
-@admin.register(Quiz)
-class QuizAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "numOfQuestions", "binary")
+from .models import Question, Answer, GuestResponse
 
 
 @admin.register(Answer)
@@ -14,7 +9,7 @@ class AnswerAdmin(admin.ModelAdmin):
 
 @admin.register(GuestResponse)
 class ResponseAdmin(admin.ModelAdmin):
-    list_display = ("id", "email", "firstname", "lastname", "quiz",
+    list_display = ("id", "email", "firstname", "lastname",
                     "totalScore", "submitDate")
 
 

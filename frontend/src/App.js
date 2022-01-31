@@ -7,30 +7,59 @@ import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import React, { useState } from "react";
 import ResponsesScreen from "./screens/ResponsesScreen";
 import LoginScreen from "./screens/LoginScreen";
-import NewQuizScreen from "./screens/NewQuizScreen";
+import AddQuestionScreen from "./screens/AddQuestionScreen";
 import { AuthTokenContext } from "./store";
 
 function App() {
-  const [mode, setMode] = useState("True");
+  const [mode, setMode] = useState(true);
   const [authToken, setAuthToken] = useState(localStorage.getItem("token"));
+  const [firstname, setFirstname] = useState("");
+  const [lastname, setLastname] = useState("");
+  const [numOfQuestions, setNumOfQuestions] = useState(10);
+  const [email, setEmail] = useState("");
 
   return (
     <AuthTokenContext.Provider value={[authToken, setAuthToken]}>
       <Router>
-        <Header setMode={setMode} />
+        <Header setMode={setMode} mode={mode} />
         <main className="py-3">
           <Container>
             <Routes>
-              <Route path="/" element={<HomeScreen mode={mode} />} />
-              <Route path="/quiz/:id" element={<QuestionsScreen />} />
+              <Route
+                path="/"
+                element={
+                  <HomeScreen
+                    setFirstname={setFirstname}
+                    setLastname={setLastname}
+                    setEmail={setEmail}
+                    setNumOfQuestions={setNumOfQuestions}
+                    numOfQuestions={numOfQuestions}
+                    firstname={firstname}
+                    lastname={lastname}
+                    email={email}
+                  />
+                }
+              />
+              <Route
+                path="/questions"
+                element={
+                  <QuestionsScreen
+                    setFirstname={setFirstname}
+                    setLastname={setLastname}
+                    setNumOfQuestions={setNumOfQuestions}
+                    mode={mode}
+                    numOfQuestions={numOfQuestions}
+                    firstname={firstname}
+                    lastname={lastname}
+                    email={email}
+                  />
+                }
+              />
               <Route path="admin/login" element={<LoginScreen />} />
-              {authToken && (
-                <Route path="">
-                  <Route path="admin/quiz" element={<NewQuizScreen />} />
-                  <Route path="admin/responses" element={<ResponsesScreen />} />
-                </Route>
-              )}
-              <Route path="*" element={<HomeScreen mode={mode} />} />
+              <Route path="">
+                <Route path="admin/question" element={<AddQuestionScreen />} />
+                <Route path="admin/responses" element={<ResponsesScreen />} />
+              </Route>
             </Routes>
           </Container>
         </main>

@@ -26,7 +26,7 @@ function Question({ question, updateAnswer, correctAnswer }) {
                 }
                 inline
                 label={answer.text}
-                onClick={() => updateAnswer(question.id, answer.id)}
+                onClick={(e) => updateAnswer(question.id, answer.id)}
                 name={`answer-${question.id}`}
                 type="radio"
                 id={`radio-${answer.id}`}

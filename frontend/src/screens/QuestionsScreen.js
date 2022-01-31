@@ -1,127 +1,111 @@
 import React, { useEffect, useState } from "react";
-import { useMatch } from "react-router-dom";
 import axios from "axios";
 import Question from "../components/Question";
-import UserForm from "../components/UserForm";
-import { Button, Row, Form, Card, Col } from "react-bootstrap";
+import { Button, Row, Form, Col, Card } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
-function QuestionsScreen() {
-  const match = useMatch("/quiz/:id");
+function QuestionsScreen({ mode, numOfQuestions, firstname, lastname, email }) {
+  const navigate = useNavigate();
+
   const [questions, setQuestions] = useState([]);
   const [answers, setAnswers] = useState([]);
   const [results, setResults] = useState();
-
-  const [firstname, setFirstname] = useState("");
-  const [lastname, setLastname] = useState("");
-  const [email, setEmail] = useState("");
-  const [profile, setProfile] = useState(false);
-
-  const quizId = match ? match.params.id : null;
-
-  const updateAnswer = (questionId, answerId) => {
-    let old = [...answers].filter((answer) => answer.questionId !== questionId);
-    setAnswers([...old, { questionId: questionId, answerId: answerId }]);
-  };
+  const [reset, setReset] = useState(false);
 
   const submitHandler = (e) => {
     e.preventDefault();
-    const config = {
-      headers: {
-        "Content-type": "application/json",
-      },
-    };
     axios
-      .post(
-        "/api/responses/",
-        {
-          quizId,
-          answers,
-          firstname,
-          lastname,
-          email,
-        },
-        config
-      )
+      .post("/api/responses/", {
+        answers,
+        firstname,
+        lastname,
+        email,
+        numOfQuestions,
+      })
       .then((response) => setResults(response.data));
-    window.scrollTo(0, 0);
-    console.log({
-      quizId,
-      answers,
-      firstname,
-      lastname,
-      email,
-    });
+      window.scroll(0, 0)
+  };
+
+  const resetQuiz = (e) => {
+    setResults();
+    setReset(!reset);
   };
 
   useEffect(() => {
-    axios
-      .get(`/api/quizs/${quizId}`)
-      .then((response) => setQuestions(response.data.questions));
-  }, [quizId]);
+    if (!(firstname && lastname && email)) {
+      navigate("/");
+    } else {
+      const params = new URLSearchParams({ binary: mode, numOfQuestions });
+      axios
+        .get(`/api/questions/`, { params })
+        .then((response) => setQuestions(response.data));
+    }
+  }, [reset, mode, numOfQuestions, firstname, lastname, email, navigate]);
 
-  return profile ? (
-    results ? (
-      <div>
-        {" "}
-        <Col>
-          <Card style={{ width: "55rem", margin: "0.5rem" }}>
-            <Card.Body>
-              <Card.Title>{results.result.email}</Card.Title>
-              <Card.Text>
-                {results.result.firstname} {results.result.lastname}
-              </Card.Text>
-              <Card.Text>
-                Your Score is :{" "}
-                <b>
-                  {results.result.totalScore} Out of {questions.length}
-                </b>
-              </Card.Text>
-            </Card.Body>
-          </Card>
-        </Col>
-        <Row>
-          {questions.map((question) => (
-            <Question
-              key={question.id}
-              question={question}
-              updateAnswer={updateAnswer}
-              correctAnswer={results.answers[question.id]}
-            />
-          ))}
-        </Row>
-        <Button className="mx-2" type="submit" onClick={() => setResults()}>
-          Reset
-        </Button>
-        <Button onClick={() => setProfile(false)}>Try with Another User</Button>
-      </div>
-    ) : (
-      <Form onSubmit={submitHandler} className="d-flex">
-        <div>
+  const updateAnswer = (questionId, answerId) => {
+    let otherAnswers = [...answers].filter((x) => x.questionId !== questionId);
+    let answer = {
+      questionId,
+      answerId,
+    };
+    otherAnswers.push(answer);
+    setAnswers(otherAnswers);
+  };
+
+  return results ? (
+    <div>
+      {" "}
+      <Col>
+        <Card style={{ width: "55rem", margin: "0.5rem" }}>
+          <Card.Body>
+            <Card.Title>{results.result.email}</Card.Title>
+            <Card.Text>
+              {results.result.firstname} {results.result.lastname}
+            </Card.Text>
+            <Card.Text>
+              Your Score is :{" "}
+              <b>
+                {results.result.totalScore} out of {questions.length}
+              </b>
+            </Card.Text>
+          </Card.Body>
+        </Card>
+      </Col>
+      <Row>
+        {questions.map((question) => (
+          <Question
+            key={question.id}
+            question={question}
+            correctAnswer={results.answers[question.id]}
+          />
+        ))}
+      </Row>
+      <Button className="mx-2" type="submit" onClick={() => resetQuiz()}>
+        Reset
+      </Button>
+      <Button onClick={() => navigate("/")}>Try with Another User</Button>
+    </div>
+  ) : (
+    <div>
+      {questions === [] ? (
+        <h1>There are no Questions</h1>
+      ) : (
+        <Form onSubmit={submitHandler}>
           <Row>
             {questions.map((question) => (
               <Question
                 key={question.id}
-                question={question}
                 updateAnswer={updateAnswer}
+                question={question}
               />
             ))}
           </Row>
-          <Button className="mx-2" type="submit">
-            Submit
+          <Button type="submit" variant="primary" className="my-2">
+            Complete Quiz
           </Button>
-        </div>
-      </Form>
-    )
-  ) : (
-    <UserForm
-      setProfile={setProfile}
-      email={email}
-      firstname={firstname}
-      lastname={lastname}
-      setEmail={setEmail}
-      setFirstname={setFirstname}
-      setLastname={setLastname}
-    />
+        </Form>
+      )}
+    </div>
   );
 }
 

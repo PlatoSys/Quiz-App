@@ -3,22 +3,18 @@ from django.test import TestCase
 from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
-from ..models import Answer, Question, Quiz
+from ..models import Answer, Question
 from django.contrib.auth import get_user_model
 User = get_user_model()
 
-CREATE_QUIZ_URL = reverse("quiz:create_quiz-list")
-RETRIEVE_QUIZ_URL = reverse("quiz:quiz-list")
+QUESTION_URL = reverse("quiz:admin-questions-list")
 RESPONSE_URL = reverse("quiz:response-list")
+ADMIN_RESPONSES_URL = reverse("quiz:admin-responses-list")
 
-PAYLOAD = {
-    "name": "TestQuiz",
-    "numOfQuestions": 1,
-    "binary": "True",
-    "questions": [{
-        "id": 1,
-        "text": "Question 1",
-        "answers": [
+QUESTION_PAYLOAD = {
+    "text": "Question 1",
+    "questionType": "True",
+    "possibleAnswers": [
             {
                 "id": 1,
                 "text": "answer1 True",
@@ -29,14 +25,14 @@ PAYLOAD = {
                 "text": "answer2",
                 "correct": "False"
             }
-        ]
-    }]
+    ]
 }
+
 response_dict = {
-    "quizId": 1,
     "firstname": "Test",
     "lastname": "Test",
     "email": "Test",
+    "numOfQuestions": 1,
     "answers": [
             {
                 "questionId": 1,
@@ -54,7 +50,7 @@ def create_superuser():
     )
 
 
-class Admin(TestCase):
+class TestQuizAPI(TestCase):
     """Test Quiz Creation"""
 
     def setUp(self):
@@ -62,147 +58,130 @@ class Admin(TestCase):
         self.user = create_superuser()
         self.client.force_authenticate(user=self.user)
 
-    def create_quiz(self, questionNum=10):
-        """Create Default Quiz"""
-        return Quiz.objects.create(name="TestQuiz", numOfQuestions=questionNum)
-
-    def create_question(self, quiz, text="TestQuestion"):
+    def create_question(self, text="TestQuestion"):
         """Create Default Question"""
-        return Question.objects.create(quiz=quiz, text=text)
+        return Question.objects.create(text=text)
 
     def create_answer(self, question, text="TestQuestion", correct=False):
         """Create Default Answer"""
         return Answer.objects.create(question=question, text=text,
                                      correct=correct)
 
-    def test_create_quiz(self):
+    def test_create_question(self):
         """Test for Creating quiz"""
-        self.create_quiz()
+        self.create_question("TestQuestion")
+        self.assertEqual(len(Question.objects.all()), 1)
+        first = Question.objects.first()
+        self.assertEqual(first.text, "TestQuestion")
 
-        self.assertEqual(len(Quiz.objects.all()), 1)
+    def test_create_answer(self):
+        """Test create Answers"""
+        question = self.create_question()
+        self.create_answer(question=question, text="A1", correct=False)
+        self.create_answer(question=question, text="A2", correct=True)
 
-    def test_create_quiz_using_post(self):
-        """Test create Quiz using Post"""
-        response = str(PAYLOAD).replace("'", "\"")
-        res = self.client.post(CREATE_QUIZ_URL, response,
-                               content_type="application/json")
+        answers = Answer.objects.all()
 
-        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
-
-        questions = res.data['questions']
-
-        self.assertEqual(len(questions), 1)
-        first_question = questions[0]
-        payload_question = PAYLOAD['questions'][0]
-        self.assertEqual(first_question['text'], payload_question['text'])
-
-        answers = first_question['answers']
-        payload_answers = payload_question['answers']
-        for postAnswer, payloadAnswer in zip(answers, payload_answers):
-            self.assertEqual(postAnswer['text'], payloadAnswer['text'])
-
-    def test_question_adding(self):
-        """Test Questions adding to quiz"""
-        quiz = self.create_quiz()
-        self.create_question(quiz, "Question1")
-        self.create_question(quiz, "Question2")
-
-        res = self.client.get(RETRIEVE_QUIZ_URL)
-        data = res.data
-        self.assertEqual(len(data), 1)
-        self.assertEqual(len(data[0]["questions"]), 2)
-
-    def test_answer_adding(self):
-        """Test Questions adding to quiz"""
-        quiz = self.create_quiz()
-        question1 = self.create_question(quiz, "Question1")
-        self.create_answer(question1, True)
-        self.create_answer(question1, False)
-
-        res = self.client.get(RETRIEVE_QUIZ_URL)
-        data = res.data
-        self.assertEqual(res.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(data), 1)
-        self.assertEqual(len(data[0]["questions"]), 1)
-        self.assertEqual(len(data[0]["questions"][0]["answers"]), 2)
+        self.assertNotEqual(answers[0].correct, answers[1].correct)
 
     def test_check_right_response(self):
         """Test check Response"""
-        quiz = self.create_quiz(questionNum=1)
-        question1 = self.create_question(quiz, "Question1")
-
+        question1 = self.create_question("Question1")
         self.create_answer(question1, correct=True)
         self.create_answer(question1, correct=False)
 
-        response = str(response_dict).replace("'", "\"")
-        res = self.client.post(RESPONSE_URL, response,
+        request = str(response_dict).replace("'", "\"")
+        res = self.client.post(RESPONSE_URL, request,
                                content_type="application/json")
 
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         result = res.data['result']
         answers = res.data['answers']
+        for answer in answers.values():
+            self.assertTrue(answer['result'])
+            self.assertEqual(answer['correctAnswer'], answer['userAnswer'])
         self.assertEqual(result['totalScore'], 1)
-        self.assertEqual(result['total_qty'], 1)
+        self.assertEqual(result['totalQuestion'], 1)
         self.assertEqual(result['firstname'], response_dict['firstname'])
         self.assertEqual(result['lastname'], response_dict['lastname'])
         self.assertEqual(result['email'], response_dict['email'])
 
         self.assertEqual(len(answers), 1)
-        for answer in answers.values():
-            self.assertTrue(answer['result'])
-            self.assertEqual(answer['correctAnswer'], answer['userAnswer'])
 
     def test_check_wrong_response(self):
         """Test check Response wrong answer"""
-        quiz = self.create_quiz(questionNum=1)
-        question1 = self.create_question(quiz, "Question1")
-
-        self.create_answer(question1, correct=True)
+        question1 = self.create_question("Question1")
         self.create_answer(question1, correct=False)
+        self.create_answer(question1, correct=True)
 
-        response_dict = {
-            "quizId": 1,
-            "firstname": "Test",
-            "lastname": "Test",
-            "email": "Test",
-            "answers": [
-                    {
-                        "questionId": 1,
-                        "answerId": 2
-                    }
-                ]
-        }
-        response = str(response_dict).replace("'", "\"")
-        res = self.client.post(RESPONSE_URL, response,
+        request = str(response_dict).replace("'", "\"")
+        res = self.client.post(RESPONSE_URL, request,
                                content_type="application/json")
 
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
         result = res.data['result']
         answers = res.data['answers']
-        self.assertEqual(result['totalScore'], 0)
-        self.assertEqual(result['total_qty'], 1)
 
-        self.assertEqual(len(answers), 1)
         for answer in answers.values():
             self.assertFalse(answer['result'])
-            self.assertNotEqual(answer['correctAnswer'],
-                                answer['userAnswer'])
+            self.assertNotEqual(answer['correctAnswer'], answer['userAnswer'])
+        self.assertEqual(result['totalScore'], 0)
+        self.assertEqual(result['totalQuestion'], 1)
+        self.assertEqual(result['firstname'], response_dict['firstname'])
+        self.assertEqual(result['lastname'], response_dict['lastname'])
+        self.assertEqual(result['email'], response_dict['email'])
 
-    def test_post_quiz_and_response(self):
-        """Test create Quiz using Post and check response using post"""
-        response = str(PAYLOAD).replace("'", "\"")
-        res = self.client.post(CREATE_QUIZ_URL, response,
+
+class TestAdminActions(TestCase):
+    """Test Admin Actions"""
+
+    def setUp(self):
+        self.client = APIClient()
+        self.user = create_superuser()
+        self.client.force_authenticate(user=self.user)
+
+    def test_create_question_request(self):
+        """Create Question using request"""
+        request = str(QUESTION_PAYLOAD).replace("'", "\"")
+        res = self.client.post(QUESTION_URL, request,
+                               content_type="application/json")
+
+        self.assertEqual(res.status_code, status.HTTP_201_CREATED)
+        data = res.data
+        self.assertTrue(data['binary'])
+        self.assertEqual(len(data['answers']), 2)
+
+        localAnswers = Answer.objects.all()
+        for localAns, resAns in zip(localAnswers,
+                                    QUESTION_PAYLOAD['possibleAnswers']):
+            self.assertEqual(localAns.text, resAns['text'])
+            self.assertEqual(str(localAns.correct), resAns['correct'])
+
+    def test_responses_view(self):
+        """Test Responses"""
+        # Create Question
+        request = str(QUESTION_PAYLOAD).replace("'", "\"")
+        res = self.client.post(QUESTION_URL, request,
                                content_type="application/json")
 
         self.assertEqual(res.status_code, status.HTTP_201_CREATED)
 
-        guestResponse = str(response_dict).replace("'", "\"")
-        guestRes = self.client.post(RESPONSE_URL, guestResponse,
-                                    content_type="application/json")
+        # Create Response
+        request = str(response_dict).replace("'", "\"")
+        res = self.client.post(RESPONSE_URL, request,
+                               content_type="application/json")
 
-        self.assertEqual(guestRes.status_code, status.HTTP_200_OK)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
 
-        postAnswer = res.data['questions'][0]['answers']
-        guestAnswer = guestRes.data['answers']
+        # Get Response
+        res = self.client.get(ADMIN_RESPONSES_URL)
+        self.assertEqual(res.status_code, status.HTTP_200_OK)
+        self.assertEqual(len(res.data), 1)
+        first_response = res.data[0]
 
-        self.assertNotEqual(len(postAnswer), len(guestAnswer))
-        for answer in guestAnswer.values():
-            self.assertEqual(answer['correctAnswer'], postAnswer[0]['id'])
+        self.assertEqual(first_response['firstname'],
+                         response_dict['firstname'])
+        self.assertEqual(first_response['lastname'], response_dict['lastname'])
+        self.assertEqual(first_response['email'], response_dict['email'])
+        self.assertEqual(first_response['totalScore'], 1)
+        self.assertEqual(first_response['totalQuestion'], 1)

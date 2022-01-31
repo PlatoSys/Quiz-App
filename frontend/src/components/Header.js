@@ -12,7 +12,7 @@ import { useNavigate } from "react-router-dom";
 import { useContext } from "react";
 import { AuthTokenContext } from "../store";
 
-function Header({ setMode }) {
+function Header({ setMode, mode }) {
   const navigate = useNavigate();
   const [authToken, setAuthToken] = useContext(AuthTokenContext);
 
@@ -44,8 +44,8 @@ function Header({ setMode }) {
             >
               {authToken ? (
                 <NavDropdown title={"Admin"} id="admin">
-                  <LinkContainer to="admin/quiz/">
-                    <NavDropdown.Item>New Quiz</NavDropdown.Item>
+                  <LinkContainer to="admin/question/">
+                    <NavDropdown.Item>Add Question</NavDropdown.Item>
                   </LinkContainer>
                   <LinkContainer to="admin/responses/">
                     <NavDropdown.Item>Responses</NavDropdown.Item>
@@ -61,12 +61,16 @@ function Header({ setMode }) {
               )}
             </Nav>
           </Navbar.Collapse>
-          <DropdownButton id="mode-selector" title="Select Mode">
-            <Dropdown.Item id="binary" onClick={(e) => changeMode("True")}>
+          <DropdownButton
+            className="pr-2"
+            id="mode-selector"
+            title={mode ? "Binary" : "Multiple Choice"}
+          >
+            <Dropdown.Item id="binary" onClick={(e) => changeMode(true)}>
               Binary
             </Dropdown.Item>
-            <Dropdown.Item id="non-binary" onClick={(e) => changeMode("False")}>
-              Multi Choice
+            <Dropdown.Item id="non-binary" onClick={(e) => changeMode(false)}>
+              Multiple
             </Dropdown.Item>
           </DropdownButton>
         </Container>

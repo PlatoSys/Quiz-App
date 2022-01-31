@@ -3,10 +3,10 @@ import random
 import faker.providers
 from django.core.management.base import BaseCommand
 from faker import Faker
-from quiz.models import Quiz, Question, Answer
+from quiz.models import Question, Answer
 
-QUESTIONS = [f"Dump Question {i}" for i in range(1, 100)]
-ANSWERS = [f"Dump Answer {i}" for i in range(1, 100)]
+QUESTIONS = [f"Dump Question {i}" for i in range(1, 150)]
+ANSWERS = [f"Dump Answer {i}" for i in range(1, 150)]
 
 
 class Provider(faker.providers.BaseProvider):
@@ -26,10 +26,9 @@ class Command(BaseCommand):
         fake.add_provider(Provider)
 
         # Binary Quiz
-        quiz = Quiz.objects.create(name="Binary Quiz 1")
-        for _ in range(10):
+        for _ in range(20):
             question_text = fake.unique.quiz_questions()
-            question = Question.objects.create(quiz=quiz, text=question_text)
+            question = Question.objects.create(text=question_text, binary=True)
 
             ans1 = fake.unique.quiz_answers()
             ans2 = fake.unique.quiz_answers()
@@ -41,10 +40,10 @@ class Command(BaseCommand):
                                   text=f"{ans2} - {ans2_bool}")
 
         # Multiple choice Quiz
-        quiz = Quiz.objects.create(name="Multiple Choice Quiz 1", binary=False)
-        for _ in range(10):
+        for _ in range(20):
             question_text = fake.unique.quiz_questions()
-            question = Question.objects.create(quiz=quiz, text=question_text)
+            question = Question.objects.create(binary=False,
+                                               text=question_text)
 
             ans1 = fake.unique.quiz_answers()
             ans2 = fake.unique.quiz_answers()
@@ -57,4 +56,4 @@ class Command(BaseCommand):
                                   text=f"{ans2} - {booleans[1]}")
             Answer.objects.create(question=question, correct=booleans[2],
                                   text=f"{ans3} - {booleans[2]}")
-        self.stdout.write("Generated 2 Quizes with 10 Questions")
+        self.stdout.write("Generated 40 Question with answers")

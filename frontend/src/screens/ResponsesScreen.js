@@ -4,22 +4,28 @@ import { Button, Table } from "react-bootstrap";
 import { LinkContainer } from "react-router-bootstrap";
 import { useContext } from "react";
 import { AuthTokenContext } from "../store";
+import { useNavigate } from "react-router-dom";
 
 function ResponsesScreen() {
+  const navigate = useNavigate();
   const [responses, setResponses] = useState([]);
   const [authToken] = useContext(AuthTokenContext);
 
-  const config = {
-    headers: {
-      "Content-type": "application/json",
-      Authorization: authToken,
-    },
-  };
   useEffect(() => {
-    axios
-      .get(`/api/admin/responses/`, config)
-      .then((response) => setResponses(response.data));
-  }, []);
+    if (!authToken) {
+      navigate("/");
+    } else {
+      const config = {
+        headers: {
+          "Content-type": "application/json",
+          Authorization: authToken,
+        },
+      };
+      axios
+        .get(`/api/admin/responses/`, config)
+        .then((response) => setResponses(response.data));
+    }
+  }, [authToken, navigate]);
 
   return (
     <div>
@@ -27,7 +33,6 @@ function ResponsesScreen() {
         <thead>
           <tr>
             <th>ID</th>
-            <th>Quiz</th>
             <th>Email</th>
             <th>Firstname</th>
             <th>Lastname</th>
@@ -40,12 +45,11 @@ function ResponsesScreen() {
           {responses.map((response) => (
             <tr key={response.id}>
               <td>{response.id}</td>
-              <td>{response.quiz_name}</td>
               <td>{response.email}</td>
               <td>{response.firstname}</td>
               <td>{response.lastname}</td>
               <td>
-                {response.totalScore}/{response.total_qty}
+                {response.totalScore}/{response.totalQuestion}
               </td>
               <td>{response.submitDate.substring(0, 19).replace("T", "-")}</td>
               <td>

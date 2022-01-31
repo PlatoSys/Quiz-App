@@ -2,29 +2,13 @@ from rest_framework import viewsets
 from rest_framework.response import Response
 from rest_framework import status
 from rest_framework import mixins
-from .serializers import (AnswerSerializer, QuizSerializer,
-                          GuestResponseSerializer)
-from .models import Answer, Quiz, GuestResponse, Question
+from .serializers import (AnswerSerializer, GuestResponseSerializer,
+                          QuestionSerializer)
+from .models import Answer, GuestResponse, Question
 from rest_framework.permissions import IsAdminUser
 from rest_framework.decorators import permission_classes
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import ensure_csrf_cookie
-from copy import copy
-
-
-class QuizViewSet(viewsets.ReadOnlyModelViewSet):
-    """Quiz view for retrieving data"""
-
-    def list(self, request):
-        params = request.query_params.get('type') or True
-        quizes = Quiz.objects.filter(binary=params)
-        serializer = QuizSerializer(quizes, many=True)
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def retrieve(self, request, pk=None):
-        quiz = Quiz.objects.get(pk=pk)
-        serializer = QuizSerializer(quiz, many=False)
-        return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 class GuestResponseView(viewsets.GenericViewSet, mixins.CreateModelMixin):
@@ -37,7 +21,6 @@ class GuestResponseView(viewsets.GenericViewSet, mixins.CreateModelMixin):
         answers = data['answers']
         result = {}
         totalScore = 0
-        quiz = Quiz.objects.get(pk=data['quizId'])
         for each in answers:
             correctAnswer = (Answer.objects
                              .filter(question__pk=each['questionId'])
@@ -54,30 +37,45 @@ class GuestResponseView(viewsets.GenericViewSet, mixins.CreateModelMixin):
             lastname=data['lastname'],
             email=data['email'],
             totalScore=totalScore,
-            quiz=quiz
+            totalQuestion=data['numOfQuestions']
         )
         serializer = GuestResponseSerializer(response)
         return Response({'answers': result, 'result': serializer.data},
                         status=status.HTTP_200_OK)
 
 
-@permission_classes([IsAdminUser])
-class CreateQuizView(viewsets.GenericViewSet, mixins.CreateModelMixin):
-    """Quiz view for creating"""
-    serializer_class = QuizSerializer
+class QuestionsView(viewsets.GenericViewSet, mixins.ListModelMixin):
+    """Questions view"""
 
-    def perform_create(self, serializer):
-        quiz = serializer.save()
-        for question in self.request.data['questions']:
-            answers = copy(question['answers'])
-            del question['answers']
-            del question['id']
-            question = Question(quiz=quiz, **question)
-            question.save()
-            for answer in answers:
-                del answer['id']
-                answer = Answer(question=question, **answer)
-                answer.save()
+    def list(self, request):
+        binary = request.query_params.get('binary')
+        questionNum = request.query_params.get('numOfQuestions')
+        questionNum = int(questionNum) if questionNum else 10
+        binary = True if not binary else binary.lower() == "true"
+        questions = (Question.objects
+                     .filter(binary=binary).order_by('?')[:questionNum])
+        serializer = QuestionSerializer(questions, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+@permission_classes([IsAdminUser])
+class AdminQuestionView(viewsets.GenericViewSet, mixins.CreateModelMixin):
+    """Quiz view for creating"""
+    serializer_class = QuestionSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = QuestionSerializer(data=request.data)
+        serializer.is_valid()
+        question = serializer.save()
+
+        for answer in request.data['possibleAnswers']:
+            Answer.objects.create(
+                question=question,
+                text=answer['text'],
+                correct=answer['correct']
+            )
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 @permission_classes([IsAdminUser])
