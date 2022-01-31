@@ -117,10 +117,10 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'testdb2',
+        'NAME': 'quiz',
         'ENFORCE_SCHEMA': False,
         'CLIENT': {
-            'host': 'mongodb+srv://platoniquiz:platoniquiz@cluster0.r2tna.mongodb.net/testdb2?w=majority'
+            'host': 'mongodb+srv://platoniquiz:platoniquiz@cluster0.r2tna.mongodb.net/quiz?w=majority'
         }  
     }
 }
