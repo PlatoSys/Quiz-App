@@ -1,8 +1,9 @@
 from rest_framework import serializers
 from .models import Answer, Question, Quiz, GuestResponse
+from rest_framework_mongoengine.serializers import DocumentSerializer
 
 
-class AnswerSerializer(serializers.ModelSerializer):
+class AnswerSerializer(DocumentSerializer):
 
     class Meta:
         model = Answer
@@ -10,7 +11,7 @@ class AnswerSerializer(serializers.ModelSerializer):
         extra_kwargs = {'correct': {'write_only': True}}
 
 
-class QuestionSerializer(serializers.ModelSerializer):
+class QuestionSerializer(DocumentSerializer):
     answers = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -23,7 +24,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         return serializer.data
 
 
-class QuizSerializer(serializers.ModelSerializer):
+class QuizSerializer(DocumentSerializer):
     questions = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
@@ -31,12 +32,12 @@ class QuizSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
     def get_questions(self, obj):
-        questions = obj.question_set.all()
+        questions = Question.objects.all()
         serializer = QuestionSerializer(questions, many=True)
         return serializer.data
 
 
-class GuestResponseSerializer(serializers.ModelSerializer):
+class GuestResponseSerializer(DocumentSerializer):
     quiz_name = serializers.SerializerMethodField(read_only=True)
     total_qty = serializers.SerializerMethodField(read_only=True)
 

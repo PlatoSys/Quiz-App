@@ -16,9 +16,14 @@ class QuizViewSet(viewsets.ReadOnlyModelViewSet):
     """Quiz view for retrieving data"""
 
     def list(self, request):
+        print(request.query_params, type(request.query_params.get('type')))
         params = request.query_params.get('type') or True
         quizes = Quiz.objects.filter(binary=params)
         serializer = QuizSerializer(quizes, many=True)
+        print(params)
+        for i in serializer.data:
+            print(i['binary'])
+            print('=======================')
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def retrieve(self, request, pk=None):
@@ -40,14 +45,14 @@ class GuestResponseView(viewsets.GenericViewSet, mixins.CreateModelMixin):
         quiz = Quiz.objects.get(pk=data['quizId'])
         for each in answers:
             correctAnswer = (Answer.objects
-                             .filter(question__pk=each['questionId'])
+                             .filter(question=each['question'])
                              .filter(correct=True).get())
             serializer = AnswerSerializer(correctAnswer, many=False)
-            isRight = correctAnswer.id == each['answerId']
+            isRight = correctAnswer.id == each['id']
             totalScore = totalScore + 1 if isRight else totalScore
-            result[each['questionId']] = {"result": isRight,
-                                          "correctAnswer": correctAnswer.id,
-                                          "userAnswer": each['answerId']}
+            result[each['question']] = {"result": isRight,
+                                        "correctAnswer": serializer.data['id'],
+                                        "userAnswer": each['id']}
 
         response = GuestResponse.objects.create(
             firstname=data['firstname'],

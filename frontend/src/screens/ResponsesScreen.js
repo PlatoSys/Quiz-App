@@ -9,17 +9,23 @@ function ResponsesScreen() {
   const [responses, setResponses] = useState([]);
   const [authToken] = useContext(AuthTokenContext);
 
-  const config = {
+  let config = {
     headers: {
       "Content-type": "application/json",
       Authorization: authToken,
     },
   };
   useEffect(() => {
+    config = {
+      headers: {
+        "Content-type": "application/json",
+        Authorization: authToken,
+      },
+    };
     axios
       .get(`/api/admin/responses/`, config)
       .then((response) => setResponses(response.data));
-  }, []);
+  }, [config]);
 
   return (
     <div>

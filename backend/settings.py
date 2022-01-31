@@ -2,6 +2,8 @@ import os
 from pathlib import Path
 from datetime import timedelta
 import environ
+import mongoengine
+import dns
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 env = environ.Env()
@@ -30,6 +32,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'corsheaders',
     'rest_framework_simplejwt',
+    'rest_framework_mongoengine',
 
     'quiz'
 ]
@@ -112,12 +115,14 @@ WSGI_APPLICATION = 'backend.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
+mongoengine.connect(db="quizdb", username="platoniquiz", password="platoniquiz",
+                    host="mongodb+srv://platoniquiz:platoniquiz@cluster0.r2tna.mongodb.net/quizdb?w=majority")
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
 
 
 # Password validation
