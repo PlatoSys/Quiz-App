@@ -25,7 +25,7 @@
 # Development Roadmap
 ## Backend
 ### I've decided to build REST architecture for this task. Created new 'quiz' app which serves all the nacessary requests from frontend. for user I've user built-in User and admin is authorized using simple-jwt token.
-### For testing purposes I've used django Test and covered all the apis and model creation parts as well.
+### For testing purposes I've used django Test and covered all the apis and model creation parts as well. During development process I've used postman to test API endpoints.
 ### Also created CI Job in gitlab for tests and python code is validated with flake8.
 <hr>
 
